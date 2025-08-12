@@ -1,14 +1,21 @@
 {
   "name": "medspeak-simplifier-backend",
   "version": "1.0.0",
+  "description": "Backend API for MedSpeak Simplifier Hackathon project",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "@huggingface/inference": "^1.2.0"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "openai": "^4.21.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
