@@ -1,34 +1,33 @@
-const express = require("express");
-const cors = require("cors");
-const OpenAI = require("openai");
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import { HfInference } from "@huggingface/inference";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const hf = new HfInference();
 
 app.post("/simplify", async (req, res) => {
   try {
-    const { text } = req.body;
-    if (!text) return res.status(400).json({ error: "No text provided" });
+    const { text, language, educationLevel } = req.body;
 
-    const prompt = `Simplify this medical text for a general audience:\n\n${text}`;
+    if (!text) {
+      return res.status(400).json({ error: "No text provided" });
+    }
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 500,
+    const prompt = `Simplify the following medical text for a ${educationLevel} in ${language}:\n\n${text}`;
+
+    const output = await hf.textGeneration({
+      model: "google/t5-small-lm-adapt",
+      inputs: prompt,
+      parameters: { max_new_tokens: 100, do_sample: false },
     });
 
-    const simplifiedText = completion.choices[0].message.content;
-    res.json({ simplifiedText });
+    res.json({ simplifiedText: output.generated_text || "No simplification available." });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error simplifying text" });
+    res.status(500).json({ error: "Failed to simplify text" });
   }
 });
 
